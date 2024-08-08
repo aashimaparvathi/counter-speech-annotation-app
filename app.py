@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import json
+import csv
 from collections import defaultdict
 
 # Load your data
@@ -33,9 +33,9 @@ def toggle_guidelines():
 def toggle_debug_mode():
     st.session_state.debug_mode = not st.session_state.debug_mode
 
-# Function to save annotations to a JSON file
+# Function to save annotations to a CSV file
 def save_annotations():
-    annotations = {
+    annotated_data = {
         'id': [],
         'hateSpeech': [],
         'counterSpeech': [],
@@ -43,13 +43,20 @@ def save_annotations():
     }
     for index, annotation in st.session_state.annotations.items():
         if annotation != "Select a strategy":
-            annotations['id'].append(data.iloc[index]['id'])
-            annotations['hateSpeech'].append(data.iloc[index]['hateSpeech'])
-            annotations['counterSpeech'].append(data.iloc[index]['counterSpeech'])
-            annotations['annotation'].append(annotation)
+            annotated_data['id'].append(data.iloc[index]['id'])
+            annotated_data['hateSpeech'].append(data.iloc[index]['hateSpeech'])
+            annotated_data['counterSpeech'].append(data.iloc[index]['counterSpeech'])
+            annotated_data['annotation'].append(annotation)
 
-    with open('annotated_data.json', 'w') as f:
-        json.dump(annotations, f)
+    # Write to CSV file
+    with open('annotated_data.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['id', 'hateSpeech', 'counterSpeech', 'annotation'])
+        for i in range(len(annotated_data['id'])):
+            writer.writerow([annotated_data['id'][i],
+                             annotated_data['hateSpeech'][i],
+                             annotated_data['counterSpeech'][i],
+                             annotated_data['annotation'][i]])
     st.success("Annotations saved successfully!")
 
 # Function to show only annotated cases
@@ -139,14 +146,8 @@ if st.session_state.username:
     if st.session_state.debug_mode:
         show_annotated_cases()
 
-    # Exit button with confirmation
-    if st.sidebar.button("Exit"):
-        st.warning("Are you sure you wish to exit?")
-        if st.button("Yes, exit and save annotations"):
-            save_annotations()
-            st.stop()
-        if st.button("No, continue annotating"):
-            st.write("Continuing annotation...")
+    # Save annotations periodically
+    st.button("Save Annotations", on_click=save_annotations)
 
 else:
     st.sidebar.warning("Please login to continue.")
