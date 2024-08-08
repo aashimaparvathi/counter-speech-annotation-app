@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import json
+from collections import defaultdict
 
 # Load your data
 data = pd.read_csv('data/csv/iconan_train.csv')
@@ -10,7 +12,9 @@ if 'username' not in st.session_state:
 if 'show_guidelines' not in st.session_state:
     st.session_state.show_guidelines = False
 if 'annotations' not in st.session_state:
-    st.session_state.annotations = [0] * len(data)  # Initialize with indices for 'Select a strategy'
+    st.session_state.annotations = defaultdict(lambda: "Select a strategy")
+if 'page' not in st.session_state:
+    st.session_state.page = 0
 
 # Function to handle user login
 def user_login():
@@ -23,6 +27,47 @@ def user_login():
 def toggle_guidelines():
     st.session_state.show_guidelines = not st.session_state.show_guidelines
 
+# Function to save annotations to a JSON file
+def save_annotations():
+    annotations = {
+        'id': [],
+        'hateSpeech': [],
+        'counterSpeech': [],
+        'annotation': []
+    }
+    for index, annotation in st.session_state.annotations.items():
+        if annotation != "Select a strategy":
+            annotations['id'].append(data.iloc[index]['id'])
+            annotations['hateSpeech'].append(data.iloc[index]['hateSpeech'])
+            annotations['counterSpeech'].append(data.iloc[index]['counterSpeech'])
+            annotations['annotation'].append(annotation)
+
+    with open('annotated_data.json', 'w') as f:
+        json.dump(annotations, f)
+    st.success("Annotations saved successfully!")
+    st.json(annotations)  # Display the JSON in the Streamlit app
+
+# Function to show only annotated cases
+def show_annotated_cases():
+    annotated_cases = {k: v for k, v in st.session_state.annotations.items() if v != "Select a strategy"}
+    if annotated_cases:
+        st.write("Annotated Cases:")
+        for index, label in annotated_cases.items():
+            st.write(f"ID: {data.iloc[index]['id']}")
+            st.write(f"Hate Speech: {data.iloc[index]['hateSpeech']}")
+            st.write(f"Counter Speech: {data.iloc[index]['counterSpeech']}")
+            st.write(f"Annotation: {label}")
+            st.write("---")
+    else:
+        st.write("No annotations yet.")
+
+# Function to handle pagination
+def next_page():
+    st.session_state.page += 1
+
+def prev_page():
+    st.session_state.page -= 1
+
 # Title of your app
 st.title('Annotation Task for Counterspeech Strategies')
 
@@ -33,17 +78,6 @@ if st.session_state.username:
 
     # Define constants for pagination
     ITEMS_PER_PAGE = 10
-
-    # Initialize session state for pagination
-    if 'page' not in st.session_state:
-        st.session_state.page = 0
-
-    # Pagination function
-    def next_page():
-        st.session_state.page += 1
-
-    def prev_page():
-        st.session_state.page -= 1
 
     # Calculate the range of indices for the current page
     start_idx = st.session_state.page * ITEMS_PER_PAGE
@@ -59,15 +93,13 @@ if st.session_state.username:
             st.text_area("Hate Speech", value=row['hateSpeech'], height=100, disabled=True, key=f"hate_speech_{index}")
             st.text_area("Counter Speech", value=row['counterSpeech'], height=100, disabled=True, key=f"counter_speech_{index}")
 
-            current_strategy_index = st.session_state.annotations[index + start_idx]
-            selected_index = st.selectbox("Choose the counterspeech strategy",
-                                          strategy_options,
-                                          index=current_strategy_index,
-                                          key=f"strategy{index}")
+            current_strategy = st.session_state.annotations[index + start_idx]
+            selected_strategy = st.selectbox("Choose the counterspeech strategy",
+                                             strategy_options,
+                                             index=strategy_options.index(current_strategy),
+                                             key=f"strategy{index}")
 
-            # Ensure selected_index is handled as an integer for session state updates
-            if isinstance(selected_index, int):
-                st.session_state.annotations[index + start_idx] = selected_index
+            st.session_state.annotations[index + start_idx] = selected_strategy
 
     # Pagination buttons
     col1, col2 = st.columns(2)
@@ -95,5 +127,18 @@ if st.session_state.username:
             st.write("Counterspeech Annotation Guidelines")
             for strategy, description in guidelines.items():
                 st.write(f"**{strategy}**: {description}")
+
+    # Exit button with confirmation
+    if st.sidebar.button("Exit"):
+        st.warning("Are you sure you wish to exit?")
+        if st.button("Yes, exit and save annotations"):
+            save_annotations()
+            st.stop()
+        if st.button("No, continue annotating"):
+            st.write("Continuing annotation...")
+
+    # Display annotated cases
+    show_annotated_cases()
+
 else:
     st.sidebar.warning("Please login to continue.")
