@@ -43,9 +43,11 @@ def save_annotations():
     }
     for index, annotation in st.session_state.annotations.items():
         if annotation != "Select a strategy":
-            annotated_data['id'].append(data.iloc[index]['id'])
-            annotated_data['hateSpeech'].append(data.iloc[index]['hateSpeech'])
-            annotated_data['counterSpeech'].append(data.iloc[index]['counterSpeech'])
+            # Use the correct index to get the ID from the data
+            actual_index = int(index)  # Convert index from str to int
+            annotated_data['id'].append(data.iloc[actual_index]['id'])
+            annotated_data['hateSpeech'].append(data.iloc[actual_index]['hateSpeech'])
+            annotated_data['counterSpeech'].append(data.iloc[actual_index]['counterSpeech'])
             annotated_data['annotation'].append(annotation)
 
     # Write to CSV file
@@ -65,9 +67,10 @@ def show_annotated_cases():
     if annotated_cases:
         st.write("Annotated Cases:")
         for index, label in annotated_cases.items():
-            st.write(f"ID: {data.iloc[index]['id']}")
-            st.write(f"Hate Speech: {data.iloc[index]['hateSpeech']}")
-            st.write(f"Counter Speech: {data.iloc[index]['counterSpeech']}")
+            actual_index = int(index)
+            st.write(f"ID: {data.iloc[actual_index]['id']}")
+            st.write(f"Hate Speech: {data.iloc[actual_index]['hateSpeech']}")
+            st.write(f"Counter Speech: {data.iloc[actual_index]['counterSpeech']}")
             st.write(f"Annotation: {label}")
             st.write("---")
     else:
@@ -100,18 +103,18 @@ if st.session_state.username:
     strategy_options = ["Select a strategy", "Empathy and Affiliation", "Fact-Checking",
                         "Humour/Sarcasm", "Warning of Consequences", "Shaming and Labelling",
                         "Denouncing", "Pointing Out Hypocrisy", "Counter Questions"]
-    for index, row in page_data.iterrows():
-        with st.expander(f"Case {index + 1}"):
-            st.text_area("Hate Speech", value=row['hateSpeech'], height=100, disabled=True, key=f"hate_speech_{index}")
-            st.text_area("Counter Speech", value=row['counterSpeech'], height=100, disabled=True, key=f"counter_speech_{index}")
+    for i, row in enumerate(page_data.itertuples(), start=start_idx):
+        with st.expander(f"Case {i + 1}"):
+            st.text_area("Hate Speech", value=row.hateSpeech, height=100, disabled=True, key=f"hate_speech_{i}")
+            st.text_area("Counter Speech", value=row.counterSpeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
-            current_strategy = st.session_state.annotations[index + start_idx]
+            current_strategy = st.session_state.annotations[i]
             selected_strategy = st.selectbox("Choose the counterspeech strategy",
                                              strategy_options,
                                              index=strategy_options.index(current_strategy),
-                                             key=f"strategy{index}")
+                                             key=f"strategy_{i}")
 
-            st.session_state.annotations[index + start_idx] = selected_strategy
+            st.session_state.annotations[i] = selected_strategy
 
     # Pagination buttons
     col1, col2 = st.columns(2)
