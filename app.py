@@ -6,7 +6,7 @@ from collections import defaultdict
 # Load your data
 data = pd.read_csv('data/csv/iconan_train.csv')
 
-# Initialize session state for user login, guidelines toggle, and annotations
+# Initialize session state for user login, guidelines toggle, annotations, and debug mode
 if 'username' not in st.session_state:
     st.session_state.username = None
 if 'show_guidelines' not in st.session_state:
@@ -15,6 +15,8 @@ if 'annotations' not in st.session_state:
     st.session_state.annotations = defaultdict(lambda: "Select a strategy")
 if 'page' not in st.session_state:
     st.session_state.page = 0
+if 'debug_mode' not in st.session_state:
+    st.session_state.debug_mode = False
 
 # Function to handle user login
 def user_login():
@@ -26,6 +28,10 @@ def user_login():
 # Function to toggle guidelines visibility
 def toggle_guidelines():
     st.session_state.show_guidelines = not st.session_state.show_guidelines
+
+# Function to toggle debug mode
+def toggle_debug_mode():
+    st.session_state.debug_mode = not st.session_state.debug_mode
 
 # Function to save annotations to a JSON file
 def save_annotations():
@@ -45,7 +51,6 @@ def save_annotations():
     with open('annotated_data.json', 'w') as f:
         json.dump(annotations, f)
     st.success("Annotations saved successfully!")
-    st.json(annotations)  # Display the JSON in the Streamlit app
 
 # Function to show only annotated cases
 def show_annotated_cases():
@@ -128,6 +133,12 @@ if st.session_state.username:
             for strategy, description in guidelines.items():
                 st.write(f"**{strategy}**: {description}")
 
+    # Toggle debug mode to display annotations
+    st.sidebar.checkbox("Debug Mode", on_change=toggle_debug_mode)
+
+    if st.session_state.debug_mode:
+        show_annotated_cases()
+
     # Exit button with confirmation
     if st.sidebar.button("Exit"):
         st.warning("Are you sure you wish to exit?")
@@ -136,9 +147,6 @@ if st.session_state.username:
             st.stop()
         if st.button("No, continue annotating"):
             st.write("Continuing annotation...")
-
-    # Display annotated cases
-    show_annotated_cases()
 
 else:
     st.sidebar.warning("Please login to continue.")
