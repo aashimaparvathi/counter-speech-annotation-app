@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Load your data
-data = pd.read_csv('TA1_TA2_Annotations.csv')
+data = pd.read_csv('data/csv/iconan_train.csv')
 
 # Initialize session state for user login, guidelines toggle, and annotations
 if 'username' not in st.session_state:
@@ -51,16 +51,16 @@ if st.session_state.username:
     page_data = data.iloc[start_idx:end_idx]
 
     # Display current page pairs
-    strategy_options = ["Select a strategy", "Empathy and Affiliation", "Fact-Checking", 
+    strategy_options = ["Select a strategy", "Empathy and Affiliation", "Fact-Checking",
                         "Humour/Sarcasm", "Warning of Consequences", "Shaming and Labelling",
                         "Denouncing", "Pointing Out Hypocrisy", "Counter Questions"]
     for index, row in page_data.iterrows():
-        with st.expander(f"Pair {index + 1}"):
-            st.text_area("Hate Speech", value=row['HATE_SPEECH'], height=100, disabled=True, key=f"hate_speech_{index}")
-            st.text_area("Counter Speech", value=row['COUNTER_NARRATIVE'], height=100, disabled=True, key=f"counter_speech_{index}")
-            
+        with st.expander(f"Case {index + 1}"):
+            st.text_area("Hate Speech", value=row['hateSpeech'], height=100, disabled=True, key=f"hate_speech_{index}")
+            st.text_area("Counter Speech", value=row['counterSpeech'], height=100, disabled=True, key=f"counter_speech_{index}")
+
             current_strategy_index = st.session_state.annotations[index + start_idx]
-            selected_index = st.selectbox("Choose the counterspeech strategy", 
+            selected_index = st.selectbox("Choose the counterspeech strategy",
                                           strategy_options,
                                           index=current_strategy_index,
                                           key=f"strategy{index}")
