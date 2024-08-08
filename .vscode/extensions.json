@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "nhoizey.gremlins",
+    "visualstudioexptteam.vscodeintellicode"
+  ]
+}
