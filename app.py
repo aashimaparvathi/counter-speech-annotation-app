@@ -50,8 +50,11 @@ def save_annotations():
             annotated_data['counterSpeech'].append(data.iloc[actual_index]['counterSpeech'])
             annotated_data['annotation'].append(annotation)
 
+    username = st.session_state.username  # Get the username from session state
+    filename = f'{username}_annotated_data.csv'  # Use f-string to create the filename
+
     # Write to CSV file
-    with open('annotated_data.csv', 'w', newline='') as f:
+    with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['id', 'hateSpeech', 'counterSpeech', 'annotation'])
         for i in range(len(annotated_data['id'])):
