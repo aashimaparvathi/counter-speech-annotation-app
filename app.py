@@ -12,7 +12,7 @@ if 'username' not in st.session_state:
 if 'show_guidelines' not in st.session_state:
     st.session_state.show_guidelines = False
 if 'annotations' not in st.session_state:
-    st.session_state.annotations = defaultdict(lambda: ["Select a strategy", "Select a strategy"])
+    st.session_state.annotations = defaultdict(lambda: [])
 if 'page' not in st.session_state:
     st.session_state.page = 0
 if 'debug_mode' not in st.session_state:
@@ -43,8 +43,8 @@ def save_annotations():
         'annotation_2': []
     }
     for index, annotations in st.session_state.annotations.items():
-        if annotations != ["Select a strategy", "Select a strategy"]:
-            actual_index = int(index)  # Convert index from str to int
+        if len(annotations) == 2:
+            actual_index = int(index)
             annotated_data['id'].append(data.iloc[actual_index]['id'])
             annotated_data['hateSpeech'].append(data.iloc[actual_index]['hateSpeech'])
             annotated_data['counterSpeech'].append(data.iloc[actual_index]['counterSpeech'])
@@ -68,7 +68,7 @@ def save_annotations():
 
 # Function to show only annotated cases
 def show_annotated_cases():
-    annotated_cases = {k: v for k, v in st.session_state.annotations.items() if v != ["Select a strategy", "Select a strategy"]}
+    annotated_cases = {k: v for k, v in st.session_state.annotations.items() if len(v) == 2}
     if annotated_cases:
         st.write("Annotated Cases:")
         for index, labels in annotated_cases.items():
@@ -105,24 +105,30 @@ if st.session_state.username:
     page_data = data.iloc[start_idx:end_idx]
 
     # Display current page pairs
-    strategy_options = ["Select a strategy", "Empathy and Affiliation", "Fact-Checking",
+    strategy_options = ["Empathy and Affiliation", "Fact-Checking",
                         "Humour/Sarcasm", "Warning of Consequences", "Shaming and Labelling",
                         "Denouncing", "Pointing Out Hypocrisy", "Counter Questions"]
+
     for i, row in enumerate(page_data.itertuples(), start=start_idx):
         with st.expander(f"Case {i + 1}"):
             st.text_area("Hate Speech", value=row.hateSpeech, height=100, disabled=True, key=f"hate_speech_{i}")
             st.text_area("Counter Speech", value=row.counterSpeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
-            current_strategies = st.session_state.annotations[i]
-            selected_strategies = st.multiselect("Choose two counterspeech strategies",
-                                                 strategy_options,
-                                                 default=current_strategies,
-                                                 key=f"strategy_{i}")
+            selected_strategies = st.session_state.annotations[i]
 
-            # Ensure that only two strategies are selected
+            # Display checkboxes for strategy selection
+            checkboxes = []
+            for strategy in strategy_options:
+                is_checked = strategy in selected_strategies
+                checkbox = st.checkbox(strategy, value=is_checked, key=f"strategy_{i}_{strategy}")
+                checkboxes.append(checkbox)
+
+            # Update the selected strategies
+            selected_strategies = [strategy for strategy, checked in zip(strategy_options, checkboxes) if checked]
+
             if len(selected_strategies) > 2:
                 st.warning("Please select only two strategies.")
-            elif len(selected_strategies) == 2:
+            else:
                 st.session_state.annotations[i] = selected_strategies
 
     # Pagination buttons
