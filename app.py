@@ -12,7 +12,7 @@ if 'username' not in st.session_state:
 if 'show_guidelines' not in st.session_state:
     st.session_state.show_guidelines = False
 if 'annotations' not in st.session_state:
-    st.session_state.annotations = defaultdict(lambda: "Select a strategy")
+    st.session_state.annotations = defaultdict(lambda: ["Select a strategy", "Select a strategy"])
 if 'page' not in st.session_state:
     st.session_state.page = 0
 if 'debug_mode' not in st.session_state:
@@ -39,16 +39,17 @@ def save_annotations():
         'id': [],
         'hateSpeech': [],
         'counterSpeech': [],
-        'annotation': []
+        'annotation_1': [],
+        'annotation_2': []
     }
-    for index, annotation in st.session_state.annotations.items():
-        if annotation != "Select a strategy":
-            # Use the correct index to get the ID from the data
+    for index, annotations in st.session_state.annotations.items():
+        if annotations != ["Select a strategy", "Select a strategy"]:
             actual_index = int(index)  # Convert index from str to int
             annotated_data['id'].append(data.iloc[actual_index]['id'])
             annotated_data['hateSpeech'].append(data.iloc[actual_index]['hateSpeech'])
             annotated_data['counterSpeech'].append(data.iloc[actual_index]['counterSpeech'])
-            annotated_data['annotation'].append(annotation)
+            annotated_data['annotation_1'].append(annotations[0])
+            annotated_data['annotation_2'].append(annotations[1])
 
     username = st.session_state.username  # Get the username from session state
     filename = f'{username}_annotated_data.csv'  # Use f-string to create the filename
@@ -56,25 +57,26 @@ def save_annotations():
     # Write to CSV file
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['id', 'hateSpeech', 'counterSpeech', 'annotation'])
+        writer.writerow(['id', 'hateSpeech', 'counterSpeech', 'annotation_1', 'annotation_2'])
         for i in range(len(annotated_data['id'])):
             writer.writerow([annotated_data['id'][i],
                              annotated_data['hateSpeech'][i],
                              annotated_data['counterSpeech'][i],
-                             annotated_data['annotation'][i]])
+                             annotated_data['annotation_1'][i],
+                             annotated_data['annotation_2'][i]])
     st.success("Annotations saved successfully!")
 
 # Function to show only annotated cases
 def show_annotated_cases():
-    annotated_cases = {k: v for k, v in st.session_state.annotations.items() if v != "Select a strategy"}
+    annotated_cases = {k: v for k, v in st.session_state.annotations.items() if v != ["Select a strategy", "Select a strategy"]}
     if annotated_cases:
         st.write("Annotated Cases:")
-        for index, label in annotated_cases.items():
+        for index, labels in annotated_cases.items():
             actual_index = int(index)
             st.write(f"ID: {data.iloc[actual_index]['id']}")
             st.write(f"Hate Speech: {data.iloc[actual_index]['hateSpeech']}")
             st.write(f"Counter Speech: {data.iloc[actual_index]['counterSpeech']}")
-            st.write(f"Annotation: {label}")
+            st.write(f"Annotations: {labels}")
             st.write("---")
     else:
         st.write("No annotations yet.")
@@ -111,13 +113,17 @@ if st.session_state.username:
             st.text_area("Hate Speech", value=row.hateSpeech, height=100, disabled=True, key=f"hate_speech_{i}")
             st.text_area("Counter Speech", value=row.counterSpeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
-            current_strategy = st.session_state.annotations[i]
-            selected_strategy = st.selectbox("Choose the counterspeech strategy",
-                                             strategy_options,
-                                             index=strategy_options.index(current_strategy),
-                                             key=f"strategy_{i}")
+            current_strategies = st.session_state.annotations[i]
+            selected_strategies = st.multiselect("Choose two counterspeech strategies",
+                                                 strategy_options,
+                                                 default=current_strategies,
+                                                 key=f"strategy_{i}")
 
-            st.session_state.annotations[i] = selected_strategy
+            # Ensure that only two strategies are selected
+            if len(selected_strategies) > 2:
+                st.warning("Please select only two strategies.")
+            elif len(selected_strategies) == 2:
+                st.session_state.annotations[i] = selected_strategies
 
     # Pagination buttons
     col1, col2 = st.columns(2)
