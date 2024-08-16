@@ -4,7 +4,7 @@ import csv
 from collections import defaultdict
 
 # Load your data
-data = pd.read_csv('data/csv/iconan_train.csv')
+data = pd.read_csv('data/intentconanv2/equal-target-sample.csv')
 
 # Initialize session state for user login, guidelines toggle, annotations, comments, and debug mode
 if 'username' not in st.session_state:
@@ -39,30 +39,30 @@ def toggle_debug_mode():
 def save_annotations():
     annotated_data = {
         'id': [],
-        'hateSpeech': [],
-        'counterSpeech': [],
+        'hatespeech': [],
+        'counterspeech': [],
         'annotations': [],
         'comments': []
     }
     for index, annotations in st.session_state.annotations.items():
         actual_index = int(index)
         annotated_data['id'].append(data.iloc[actual_index]['id'])
-        annotated_data['hateSpeech'].append(data.iloc[actual_index]['hateSpeech'])
-        annotated_data['counterSpeech'].append(data.iloc[actual_index]['counterSpeech'])
+        annotated_data['hatespeech'].append(data.iloc[actual_index]['hatespeech'])
+        annotated_data['counterspeech'].append(data.iloc[actual_index]['counterspeech'])
         annotated_data['annotations'].append(", ".join(annotations))
         annotated_data['comments'].append(st.session_state.comments[actual_index])
 
     username = st.session_state.username  # Get the username from session state
-    filename = f'{username}_annotated_data.csv'  # Use f-string to create the filename
+    filename = f'data/{username}_annotated_data.csv'  # Use f-string to create the filename
 
     # Write to CSV file
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['id', 'hateSpeech', 'counterSpeech', 'annotations', 'comments'])
+        writer.writerow(['id', 'hatespeech', 'counterspeech', 'annotations', 'comments'])
         for i in range(len(annotated_data['id'])):
             writer.writerow([annotated_data['id'][i],
-                             annotated_data['hateSpeech'][i],
-                             annotated_data['counterSpeech'][i],
+                             annotated_data['hatespeech'][i],
+                             annotated_data['counterspeech'][i],
                              annotated_data['annotations'][i],
                              annotated_data['comments'][i]])
     st.success("Annotations saved successfully!")
@@ -75,8 +75,8 @@ def show_annotated_cases():
         for index, labels in annotated_cases.items():
             actual_index = int(index)
             st.write(f"ID: {data.iloc[actual_index]['id']}")
-            st.write(f"Hate Speech: {data.iloc[actual_index]['hateSpeech']}")
-            st.write(f"Counter Speech: {data.iloc[actual_index]['counterSpeech']}")
+            st.write(f"Hate Speech: {data.iloc[actual_index]['hatespeech']}")
+            st.write(f"Counter Speech: {data.iloc[actual_index]['counterspeech']}")
             st.write(f"Annotations: {labels}")
             st.write(f"Comments: {st.session_state.comments[actual_index]}")
             st.write("---")
@@ -116,8 +116,8 @@ if st.session_state.username:
 
     for i, row in enumerate(page_data.itertuples(), start=start_idx):
         st.write(f"**Case {i + 1}**")
-        st.text_area("Hate Speech", value=row.hateSpeech, height=100, disabled=True, key=f"hate_speech_{i}")
-        st.text_area("Counter Speech", value=row.counterSpeech, height=100, disabled=True, key=f"counter_speech_{i}")
+        st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
+        st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
         selected_strategies = st.session_state.annotations[i]
 
@@ -170,7 +170,7 @@ if st.session_state.username:
     if st.session_state.debug_mode:
         show_annotated_cases()
 
-    # Save annotations periodically
+    # Save annotations
     st.button("Save Annotations", on_click=save_annotations)
 
 else:
