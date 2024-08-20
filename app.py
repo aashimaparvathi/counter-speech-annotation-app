@@ -140,7 +140,7 @@ if st.session_state.username:
         start_idx, end_idx = user_mapping[st.session_state.username]
         page_data = data.iloc[start_idx:end_idx]  # Initialize the user's data subset here
     else:
-        st.error("Username not recognized!")
+        st.error("Username not recognised!")
         st.stop()  # Stop the app if the username is not recognized
 
     # Determine the button label based on whether the guidelines are currently shown or hidden
