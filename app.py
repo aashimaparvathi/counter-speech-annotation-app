@@ -8,7 +8,35 @@ from collections import defaultdict
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    # Your user mapping as before
+    'CSAT1758': (0, 40),
+    'CSAT3968': (40, 80),
+    'CSAT1245': (80, 120),
+    'CSAT9877': (120, 160),
+    'CSAT1290': (160, 200),
+    'CSAT7463': (200, 240),
+    'CSAT0986': (240, 280),
+    'CSAT2365': (280, 320),
+    'CSAT9833': (320, 360),
+    'CSAT7657': (360, 400),
+    'CSAT4535': (400, 440),
+    'CSAT8973': (440, 480),
+    'CSAT5361': (480, 520),
+    'CSAT7492': (520, 560),
+
+    'CSAT0578': (0, 40),
+    'CSAT1698': (40, 80),
+    'CSAT2425': (80, 120),
+    'CSAT3787': (120, 160),
+    'CSAT4920': (160, 200),
+    'CSAT5643': (200, 240),
+    'CSAT6896': (240, 280),
+    'CSAT7635': (280, 320),
+    'CSAT8383': (320, 360),
+    'CSAT9567': (360, 400),
+    'CSAT0355': (400, 440),
+    'CSAT1793': (440, 480),
+    'CSAT2631': (480, 520),
+    'CSAT3942': (520, 560),
 }
 
 # Initialize session state for user login, guidelines toggle, annotations, comments, and debug mode
@@ -43,11 +71,11 @@ def toggle_guidelines():
 # Function to save annotations to Google Sheets
 def save_annotations():
     scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["csat_gcp_service_account"], scope)
     client = gspread.authorize(creds)
 
-    # Open your Google Sheet
-    sheet = client.open("Your Google Sheet Name").sheet1
+    # Open Google Sheet
+    sheet = client.open("CSATData").sheet1
 
     annotated_data = []
     for index, annotations in st.session_state.annotations.items():
