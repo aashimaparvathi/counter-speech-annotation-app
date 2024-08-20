@@ -1,41 +1,14 @@
 import streamlit as st
 import pandas as pd
-import csv
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from collections import defaultdict
 
 # Load the data
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    'CSAT1758': (0, 40),
-    'CSAT3968': (40, 80),
-    'CSAT1245': (80, 120),
-    'CSAT9877': (120, 160),
-    'CSAT1290': (160, 200),
-    'CSAT7463': (200, 240),
-    'CSAT0986': (240, 280),
-    'CSAT2365': (280, 320),
-    'CSAT9833': (320, 360),
-    'CSAT7657': (360, 400),
-    'CSAT4535': (400, 440),
-    'CSAT8973': (440, 480),
-    'CSAT5361': (480, 520),
-    'CSAT7492': (520, 560),
-
-    'CSAT0578': (0, 40),
-    'CSAT1698': (40, 80),
-    'CSAT2425': (80, 120),
-    'CSAT3787': (120, 160),
-    'CSAT4920': (160, 200),
-    'CSAT5643': (200, 240),
-    'CSAT6896': (240, 280),
-    'CSAT7635': (280, 320),
-    'CSAT8383': (320, 360),
-    'CSAT9567': (360, 400),
-    'CSAT0355': (400, 440),
-    'CSAT1793': (440, 480),
-    'CSAT2631': (480, 520),
-    'CSAT3942': (520, 560),
+    # Your user mapping as before
 }
 
 # Initialize session state for user login, guidelines toggle, annotations, comments, and debug mode
@@ -67,40 +40,30 @@ def user_login():
 def toggle_guidelines():
     st.session_state.show_guidelines = not st.session_state.show_guidelines
 
-# Function to toggle debug mode
-def toggle_debug_mode():
-    st.session_state.debug_mode = not st.session_state.debug_mode
-
-# Function to save annotations to a CSV file
+# Function to save annotations to Google Sheets
 def save_annotations():
-    annotated_data = {
-        'id': [],
-        'hatespeech': [],
-        'counterspeech': [],
-        'annotations': [],
-        'comments': []
-    }
+    scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
+    client = gspread.authorize(creds)
+
+    # Open your Google Sheet
+    sheet = client.open("Your Google Sheet Name").sheet1
+
+    annotated_data = []
     for index, annotations in st.session_state.annotations.items():
         actual_index = int(index)
-        annotated_data['id'].append(data.iloc[actual_index]['id'])
-        annotated_data['hatespeech'].append(data.iloc[actual_index]['hatespeech'])
-        annotated_data['counterspeech'].append(data.iloc[actual_index]['counterspeech'])
-        annotated_data['annotations'].append(", ".join(annotations))
-        annotated_data['comments'].append(st.session_state.comments[actual_index])
+        row = [
+            data.iloc[actual_index]['id'],
+            data.iloc[actual_index]['hatespeech'],
+            data.iloc[actual_index]['counterspeech'],
+            ", ".join(annotations),
+            st.session_state.comments[actual_index]
+        ]
+        annotated_data.append(row)
 
-    username = st.session_state.username  # Get the username from session state
-    filename = f'data/{username}_annotated_data.csv'  # Use f-string to create the filename
+    # Append all rows to the sheet
+    sheet.append_rows(annotated_data)
 
-    # Write annotations to CSV file
-    with open(filename, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['id', 'hatespeech', 'counterspeech', 'annotations', 'comments'])
-        for i in range(len(annotated_data['id'])):
-            writer.writerow([annotated_data['id'][i],
-                             annotated_data['hatespeech'][i],
-                             annotated_data['counterspeech'][i],
-                             annotated_data['annotations'][i],
-                             annotated_data['comments'][i]])
     st.session_state.message = "Annotations saved successfully!"
     st.session_state.message_type = "success"
 
@@ -229,7 +192,7 @@ if st.session_state.username:
 
     # Toggle debug mode to display annotations
     # NOTE: Re-enable when required
-    st.sidebar.checkbox("Debug Mode", on_change=toggle_debug_mode)
+    #st.sidebar.checkbox("Debug Mode", on_change=toggle_debug_mode)
 
     if st.session_state.debug_mode:
         show_annotated_cases()
