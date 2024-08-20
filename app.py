@@ -19,6 +19,10 @@ if 'page' not in st.session_state:
     st.session_state.page = 0
 if 'debug_mode' not in st.session_state:
     st.session_state.debug_mode = False
+if 'message' not in st.session_state:
+    st.session_state.message = ""
+if 'message_type' not in st.session_state:
+    st.session_state.message_type = ""
 
 # Function to handle user login
 def user_login():
@@ -65,7 +69,8 @@ def save_annotations():
                              annotated_data['counterspeech'][i],
                              annotated_data['annotations'][i],
                              annotated_data['comments'][i]])
-    st.success("Annotations saved successfully!")
+    st.session_state.message = "Annotations saved successfully!"
+    st.session_state.message_type = "success"
 
 # Function to show only annotated cases
 def show_annotated_cases():
@@ -87,11 +92,16 @@ def show_annotated_cases():
 def next_page():
     if all(len(st.session_state.annotations[i]) > 0 for i in range(st.session_state.page * ITEMS_PER_PAGE, min(len(data), (st.session_state.page + 1) * ITEMS_PER_PAGE))):
         st.session_state.page += 1
+        st.session_state.message = ""
+        st.session_state.message_type = ""
     else:
-        st.warning("Please select at least one strategy for each case before moving to the next page.")
+        st.session_state.message = "Please select at least one strategy for each case before moving to the next page."
+        st.session_state.message_type = "warning"
 
 def prev_page():
     st.session_state.page -= 1
+    st.session_state.message = ""
+    st.session_state.message_type = ""
 
 # Title of your app
 st.title('Annotation Task for Counterspeech Strategies')
@@ -110,9 +120,9 @@ if st.session_state.username:
     page_data = data.iloc[start_idx:end_idx]
 
     # Display current page pairs
-    strategy_options = ["Positive Tone", "Fact-Checking", "Humour/Sarcasm",
-                        "Consequences", "Shaming and Labelling", "Denouncing",
-                        "Pointing Out Hypocrisy", "Questioning"]
+    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
+                        "Pointing Out Hypocrisy", "Shaming and Labelling",
+                        "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     for i, row in enumerate(page_data.itertuples(), start=start_idx):
         st.write(f"**Case {i + 1}**")
@@ -146,26 +156,34 @@ if st.session_state.username:
         if end_idx < len(data):
             st.button("Next", on_click=next_page)
 
-    # Placeholder for Annotation guidelines
-    guidelines = {
-        "Positive Tone": "Use a positive and constructive tone.",
-        "Fact-Checking": "Address inaccuracies by presenting factual information.",
-        "Humour/Sarcasm": "Use wit or sarcasm to lighten the conversation's tone.",
-        "Consequences": "Highlight potential negative outcomes, like social or legal consequences.",
-        "Shaming and Labelling": "Call out hate speech by labeling it as discriminatory.",
-        "Denouncing": "Express outright rejection of the hateful views.",
-        "Pointing Out Hypocrisy": "Underline logical flaws or double standards in the hate speech.",
-        "Questioning": "Ask questions to challenge the hate speech."
-    }
+    # Display any messages at the bottom with appropriate formatting
+    if st.session_state.message:
+        if st.session_state.message_type == "success":
+            st.success(st.session_state.message)
+        elif st.session_state.message_type == "warning":
+            st.warning(st.session_state.message)
 
-    if st.sidebar.button("Annotation Guidelines", on_click=toggle_guidelines):
-        if st.session_state.show_guidelines:
-            st.write("Counterspeech Annotation Guidelines")
-            for strategy, description in guidelines.items():
-                st.write(f"**{strategy}**: {description}")
+    # Placeholder for Annotation guidelines
+    if st.sidebar.button("Annotation Guidelines"):
+        toggle_guidelines()
+
+    if st.session_state.show_guidelines:
+        st.write("Counterspeech Annotation Guidelines")
+        for strategy, description in {
+            "Empathy and Affiliation": "Use a positive and constructive tone.",
+            "Warning of Consequences": "Highlight potential negative outcomes, like social or legal consequences.",
+            "Pointing Out Hypocrisy": "Underline logical flaws or double standards in the hate speech.",
+            "Shaming and Labelling": "Call out hate speech by labeling it as discriminatory.",
+            "Denouncing": "Express outright rejection of the hateful views.",
+            "Fact-Checking": "Address inaccuracies by presenting factual information.",
+            "Humour/Sarcasm": "Use wit or sarcasm to lighten the conversation's tone.",
+            "Questioning": "Ask questions to challenge the hate speech."
+        }.items():
+            st.write(f"**{strategy}**: {description}")
 
     # Toggle debug mode to display annotations
-    st.sidebar.checkbox("Debug Mode", on_change=toggle_debug_mode)
+    if st.sidebar.checkbox("Debug Mode", value=st.session_state.debug_mode):
+        toggle_debug_mode()
 
     if st.session_state.debug_mode:
         show_annotated_cases()
