@@ -190,17 +190,14 @@ if st.session_state.username:
 
             selected_strategies = st.session_state.annotations[i]
 
-            # Display buttons for strategy selection as two rows
-            cols = st.columns(4)
-            for j, strategy in enumerate(strategy_options):
-                is_selected = strategy in selected_strategies
-                button_label = f"✅ {strategy}" if is_selected else strategy
-                if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
-                    if strategy in selected_strategies:
-                        selected_strategies.remove(strategy)
-                    else:
-                        selected_strategies.append(strategy)
-                    st.session_state.annotations[i] = selected_strategies
+            # Use checkboxes for strategy selection inside the form
+            selected_strategies = st.multiselect(
+                label="Select Strategies",
+                options=strategy_options,
+                default=selected_strategies,
+                key=f"strategies_{i}"
+            )
+            st.session_state.annotations[i] = selected_strategies
 
             # Add a free text box for comments
             st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
