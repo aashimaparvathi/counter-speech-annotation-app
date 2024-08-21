@@ -182,32 +182,35 @@ if st.session_state.username:
         st.markdown(html_table, unsafe_allow_html=True)
         st.markdown("<br><br>", unsafe_allow_html=True)
 
-    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
-                        "Pointing Out Hypocrisy", "Shaming and Labelling",
-                        "Denouncing", "Fact-Checking", "Humour", "Questioning"]
+    # Strategy selection inside a form
+    with st.form(key=f"annotation_form_{st.session_state.page}"):
+        for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
+            st.write(f"**Case {i + 1}**")
+            st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
+            st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
-    for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
-        st.write(f"**Case {i + 1}**")
-        st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
-        st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
+            selected_strategies = st.session_state.annotations[i]
 
-        selected_strategies = st.session_state.annotations[i]
+            # Display buttons for strategy selection as two rows
+            cols = st.columns(4)
+            for j, strategy in enumerate(strategy_options):
+                is_selected = strategy in selected_strategies
+                button_label = f"✅ {strategy}" if is_selected else strategy
+                if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
+                    if strategy in selected_strategies:
+                        selected_strategies.remove(strategy)
+                    else:
+                        selected_strategies.append(strategy)
+                    st.session_state.annotations[i] = selected_strategies
 
-        # Display buttons for strategy selection as two rows
-        cols = st.columns(4)
-        for j, strategy in enumerate(strategy_options):
-            is_selected = strategy in selected_strategies
-            button_label = f"✅ {strategy}" if is_selected else strategy
-            if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
-                if strategy in selected_strategies:
-                    selected_strategies.remove(strategy)
-                else:
-                    selected_strategies.append(strategy)
-                st.session_state.annotations[i] = selected_strategies
-                st.rerun()  # Immediately rerun to sync the button state
+            # Add a free text box for comments
+            st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
 
-        # Add a free text box for comments
-        st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
+        # Submit button for the form
+        submit_form = st.form_submit_button("Submit Annotations")
+
+    if submit_form:
+        st.success("Annotations for this page have been saved.")
 
     # Pagination buttons
     col1, col2 = st.columns(2)
