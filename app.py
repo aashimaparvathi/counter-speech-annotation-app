@@ -91,6 +91,7 @@ def save_annotations():
                 ", ".join(map(str, annotations)),
                 str(st.session_state.comments[actual_index])
             ]
+            #st.write(f"Appending row: {row}")  # DEBUGGING: Print the row to be appended
             annotated_data.append(row)
 
         # Append all rows to the sheet
@@ -101,6 +102,7 @@ def save_annotations():
     except Exception as e:
         st.error(f"Failed to save annotations (please share the error with owner): {e}")
         st.write(e)  # DEBUGGING: Print the full error for debugging purposes
+
 
 # Function to show only annotated cases
 def show_annotated_cases():
@@ -147,7 +149,7 @@ if st.session_state.username:
         start_idx, end_idx = user_mapping[st.session_state.username]
         page_data = data.iloc[start_idx:end_idx]  # Initialize the user's data subset here
     else:
-        st.error("Username not recognized!")
+        st.error("Username not recognised!")
         st.stop()  # Stop the app if the username is not recognized
 
     # Determine the button label based on whether the guidelines are currently shown or hidden
@@ -218,13 +220,6 @@ if st.session_state.username:
         if end_page_idx < len(page_data):
             st.button("Next", on_click=next_page)
 
-    # Show the Save Annotations button only on the last page and only if all annotations are complete
-    if st.session_state.page == (len(page_data) // ITEMS_PER_PAGE):
-        if all(len(st.session_state.annotations[idx]) > 0 for idx in page_data.index):
-            st.button("Save Annotations", on_click=save_annotations)
-        else:
-            st.warning("Please complete all annotations before saving.")
-
     # Display any messages at the bottom with appropriate formatting
     if st.session_state.message:
         if st.session_state.message_type == "success":
@@ -233,8 +228,14 @@ if st.session_state.username:
             st.warning(st.session_state.message)
 
     # Toggle debug mode to display annotations
+    # NOTE: Re-enable when required
+    #st.sidebar.checkbox("Debug Mode", on_change=toggle_debug_mode)
+
     if st.session_state.debug_mode:
         show_annotated_cases()
+
+    # Save annotations
+    st.button("Save Annotations", on_click=save_annotations)
 
 else:
     st.sidebar.warning("Please login to continue.")
