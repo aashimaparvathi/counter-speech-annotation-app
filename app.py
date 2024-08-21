@@ -70,30 +70,36 @@ def toggle_guidelines():
 
 # Function to save annotations to Google Sheets
 def save_annotations():
-    scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["csat_gcp_service_account"], scope)
-    client = gspread.authorize(creds)
+    try:
+        scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["csat_gcp_service_account"], scope)
+        client = gspread.authorize(creds)
 
-    # Open Google Sheet
-    sheet = client.open("CSATData").sheet1
+        # Open Google Sheet
+        sheet = client.open("CSATData").sheet1
 
-    annotated_data = []
-    for index, annotations in st.session_state.annotations.items():
-        actual_index = int(index)
-        row = [
-            data.iloc[actual_index]['id'],
-            data.iloc[actual_index]['hatespeech'],
-            data.iloc[actual_index]['counterspeech'],
-            ", ".join(annotations),
-            st.session_state.comments[actual_index]
-        ]
-        annotated_data.append(row)
+        annotated_data = []
+        for index, annotations in st.session_state.annotations.items():
+            actual_index = int(index)
+            row = [
+                str(data.iloc[actual_index]['id']),
+                str(data.iloc[actual_index]['hatespeech']),
+                str(data.iloc[actual_index]['counterspeech']),
+                ", ".join(map(str, annotations)),
+                str(st.session_state.comments[actual_index])
+            ]
+            st.write(f"Appending row: {row}")  # DEBUGGING: Print the row to be appended
+            annotated_data.append(row)
 
-    # Append all rows to the sheet
-    sheet.append_rows(annotated_data)
+        # Append all rows to the sheet
+        sheet.append_rows(annotated_data)
 
-    st.session_state.message = "Annotations saved successfully!"
-    st.session_state.message_type = "success"
+        st.session_state.message = "Annotations saved successfully!"
+        st.session_state.message_type = "success"
+    except Exception as e:
+        st.error(f"Failed to save annotations: {e}")
+        st.write(e)  # Print the full error for debugging purposes
+
 
 # Function to show only annotated cases
 def show_annotated_cases():
