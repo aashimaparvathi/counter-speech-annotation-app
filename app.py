@@ -8,8 +8,8 @@ from collections import defaultdict
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    'CSAT1758': (0, 40),
-    'CSAT3968': (40, 80),
+    'CSAT1758': (0, 10),
+    'CSAT3968': (10, 20),
     'CSAT1245': (80, 120),
     'CSAT9877': (120, 160),
     'CSAT1290': (160, 200),
