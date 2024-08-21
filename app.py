@@ -39,6 +39,7 @@ user_mapping = {
     'CSAT3942': (520, 560),
 }
 
+
 # Initialize session state for user login, guidelines toggle, annotations, comments, and debug mode
 if 'username' not in st.session_state:
     st.session_state.username = None
