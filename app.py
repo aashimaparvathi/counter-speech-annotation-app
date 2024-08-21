@@ -177,10 +177,9 @@ if st.session_state.username:
             {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker by challenging the assumptions or logic or simply asking for clarification; Inquisitive or probing tone."}
         ]
 
-        guidelines_df = pd.DataFrame(guidelines).reset_index(drop=True)
-        html_table = guidelines_df.to_html(index=False, classes='table', border=0)
-        st.markdown(html_table, unsafe_allow_html=True)
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
+                            "Pointing Out Hypocrisy", "Shaming and Labelling",
+                            "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     # Strategy selection inside a form
     with st.form(key=f"annotation_form_{st.session_state.page}"):
