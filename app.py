@@ -177,36 +177,37 @@ if st.session_state.username:
             {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker by challenging the assumptions or logic or simply asking for clarification; Inquisitive or probing tone."}
         ]
 
-        strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
-                            "Pointing Out Hypocrisy", "Shaming and Labelling",
-                            "Denouncing", "Fact-Checking", "Humour", "Questioning"]
+        guidelines_df = pd.DataFrame(guidelines).reset_index(drop=True)
+        html_table = guidelines_df.to_html(index=False, classes='table', border=0)
+        st.markdown(html_table, unsafe_allow_html=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Strategy selection inside a form
-    with st.form(key=f"annotation_form_{st.session_state.page}"):
-        for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
-            st.write(f"**Case {i + 1}**")
-            st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
-            st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
+    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
+                        "Pointing Out Hypocrisy", "Shaming and Labelling",
+                        "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
-            selected_strategies = st.session_state.annotations[i]
+    for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
+        st.write(f"**Case {i + 1}**")
+        st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
+        st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
 
-            # Use checkboxes for strategy selection inside the form
-            selected_strategies = st.multiselect(
-                label="Select Strategies",
-                options=strategy_options,
-                default=selected_strategies,
-                key=f"strategies_{i}"
-            )
-            st.session_state.annotations[i] = selected_strategies
+        selected_strategies = st.session_state.annotations[i]
 
-            # Add a free text box for comments
-            st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
+        # Display buttons for strategy selection as two rows
+        cols = st.columns(4)
+        for j, strategy in enumerate(strategy_options):
+            is_selected = strategy in selected_strategies
+            button_label = f"✅ {strategy}" if is_selected else strategy
+            if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
+                if strategy in selected_strategies:
+                    selected_strategies.remove(strategy)
+                else:
+                    selected_strategies.append(strategy)
+                st.session_state.annotations[i] = selected_strategies
+                st.rerun()  # Immediately rerun to sync the button state
 
-        # Submit button for the form
-        submit_form = st.form_submit_button("Submit Annotations")
-
-    if submit_form:
-        st.success("Annotations for this page have been saved.")
+        # Add a free text box for comments
+        st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
 
     # Pagination buttons
     col1, col2 = st.columns(2)
