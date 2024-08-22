@@ -8,8 +8,8 @@ from collections import defaultdict
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    'CSAT1758': (0, 5),
-    'CSAT3968': (10, 15),
+    'CSAT1758': (0, 10),
+    'CSAT3968': (10, 20),
     'CSAT1245': (80, 120),
     'CSAT9877': (120, 160),
     'CSAT1290': (160, 200),
@@ -160,7 +160,7 @@ if st.session_state.username:
         st.rerun()  # Rerun the app to update the button label immediately
 
     # Ensure page_data is always defined before any further processing
-    ITEMS_PER_PAGE = 2
+    ITEMS_PER_PAGE = 2  # Show only 2 cases per page
     start_page_idx = st.session_state.page * ITEMS_PER_PAGE
     end_page_idx = (st.session_state.page + 1) * ITEMS_PER_PAGE
     current_page_data = page_data.iloc[start_page_idx:end_page_idx]
@@ -189,8 +189,10 @@ if st.session_state.username:
 
     for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
         st.write(f"**Case {i + 1}**")
-        st.text_area("Hate Speech", value=row.hatespeech, height=100, disabled=True, key=f"hate_speech_{i}")
-        st.text_area("Counter Speech", value=row.counterspeech, height=100, disabled=True, key=f"counter_speech_{i}")
+
+        # Replace text_area with markdown for non-editable fields
+        st.markdown(f"**Hate Speech:** {row.hatespeech}")
+        st.markdown(f"**Counter Speech:** {row.counterspeech}")
 
         selected_strategies = st.session_state.annotations[i]
 
