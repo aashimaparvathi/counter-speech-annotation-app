@@ -8,8 +8,8 @@ from collections import defaultdict
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    'CSAT1758': (0, 10),
-    'CSAT3968': (10, 20),
+    'CSAT1758': (0, 5),
+    'CSAT3968': (10, 15),
     'CSAT1245': (80, 120),
     'CSAT9877': (120, 160),
     'CSAT1290': (160, 200),
@@ -87,6 +87,8 @@ def save_annotations():
             row = [
                 username,  # username as the first column to track annotations
                 str(data.iloc[actual_index]['id']),
+                str(data.iloc[actual_index]['hs_id']),  # Include hs_id in the saved data
+                str(data.iloc[actual_index]['id_orig']),  # Include id_orig in the saved data
                 str(data.iloc[actual_index]['hatespeech']),
                 str(data.iloc[actual_index]['counterspeech']),
                 ", ".join(map(str, annotations)),
@@ -209,8 +211,9 @@ if st.session_state.username:
                 st.session_state.annotations[i] = selected_strategies
                 st.rerun()  # Immediately rerun to sync the button state
 
-        # Add a free text box for comments
-        st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}")
+        # Add a free text box for comments with help text
+        comment_help_text = "Mismatch between HS and CS ...\nNone of the strategies apply ...\nThis case was difficult because ..."
+        st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}", help=comment_help_text)
 
     # Pagination buttons
     col1, col2 = st.columns(2)
