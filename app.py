@@ -8,8 +8,8 @@ from collections import defaultdict
 data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 
 user_mapping = {
-    'CSAT1758': (0, 5),
-    'CSAT3968': (10, 15),
+    'CSAT1758': (0, 40),
+    'CSAT3968': (40, 80),
     'CSAT1245': (80, 120),
     'CSAT9877': (120, 160),
     'CSAT1290': (160, 200),
@@ -102,7 +102,7 @@ def save_annotations():
         st.session_state.message = "Annotations saved successfully!"
         st.session_state.message_type = "success"
     except Exception as e:
-        st.error(f"Failed to save annotations (please share the error with owner): {e}")
+        st.error(f"Failed to save annotations (please share the error with project owner): {e}")
         st.write(e)  # DEBUGGING: Print the full error for debugging purposes
 
 # Function to show only annotated cases
