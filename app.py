@@ -212,7 +212,7 @@ if st.session_state.username:
                 st.rerun()  # Immediately rerun to sync the button state
 
         # Add a free text box for comments with help text
-        comment_help_text = "Mismatch between HS and CS ...\nNone of the strategies apply ...\nThis case was difficult because ..."
+        comment_help_text = "Your thoughts on the case. E.g., a mismatch between HS and CS or why this case was particularly difficult, etc."
         st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}", help=comment_help_text)
 
     # Pagination buttons
