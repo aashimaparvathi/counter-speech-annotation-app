@@ -140,6 +140,15 @@ def prev_page():
 # Title
 st.title('Counterspeech Strategy Annotation')
 
+# Custom CSS to increase sidebar width
+st.markdown("""
+    <style>
+        .sidebar .sidebar-content {
+            width: 550px;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Check if user is logged in
 user_login()
 if st.session_state.username:
@@ -156,38 +165,61 @@ if st.session_state.username:
     # Determine the button label based on whether the guidelines are currently shown or hidden
     button_label = "Hide Annotation Guidelines" if st.session_state.show_guidelines else "View Annotation Guidelines"
 
-    # Placeholder for Annotation guidelines
-    if st.sidebar.button(button_label):
-        toggle_guidelines()
-        st.rerun()  # Rerun the app to update the button label immediately
+    # Sidebar section for Annotation Guidelines
+    with st.sidebar:
+        if st.button(button_label):
+            toggle_guidelines()
+            st.rerun()  # Rerun the app to update the button label immediately
+
+        if st.session_state.show_guidelines:
+            guidelines = [
+                {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting peace, understanding, or common ground.", "Examples": "Example 1: ..."},
+                {"Strategy": "Warning of Consequences", "Explanation": "Highlights potential negative outcomes such as legal, social, or personal consequences of the hate speech; Serious, cautionary, or urgent tone.", "Examples": "Example 2: ..."},
+                {"Strategy": "Pointing Out Hypocrisy", "Explanation": "Highlights inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.", "Examples": "Example 3: ..."},
+                {"Strategy": "Shaming and Labelling", "Explanation": "Attacks/condemns and shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.", "Examples": "Example 4: ..."},
+                {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or rejects the hateful views/ideas expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, direct tone without personal attacks.", "Examples": "Example 5: ..."},
+                {"Strategy": "Fact-Checking", "Explanation": "Mentions specific (sometimes verifiable) information such as facts, statistics, articles, or evidence to contradict claims made in the hate speech; Neutral tone focused on correcting misinformation.", "Examples": "Example 6: ..."},
+                {"Strategy": "Humour/Sarcasm", "Explanation": "Uses humour, irony, or sarcasm to undermine hate speech by mocking the comment or the speaker in a light-hearted or biting way; Playful, funny, or mocking tone.", "Examples": "Example 7: ..."},
+                {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker by challenging the assumptions or logic or simply asking for clarification; Inquisitive or probing tone.", "Examples": "Example 8: ..."}
+            ]
+
+            guidelines_df = pd.DataFrame(guidelines).reset_index(drop=True)
+            # Adjusting column widths
+            st.markdown("""
+                <style>
+                    .table {
+                        width: 100%;
+                        table-layout: fixed;
+                    }
+                    .table th, .table td {
+                        overflow-wrap: break-word;
+                        word-wrap: break-word;
+                        word-break: break-word;
+                    }
+                    .table th:nth-child(1), .table td:nth-child(1) {
+                        width: 20%;
+                    }
+                    .table th:nth-child(2), .table td:nth-child(2) {
+                        width: 50%;
+                    }
+                    .table th:nth-child(3), .table td:nth-child(3) {
+                        width: 30%;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+            html_table = guidelines_df.to_html(index=False, classes='table', border=0)
+            st.markdown(html_table, unsafe_allow_html=True)
+            st.markdown("<br><br>", unsafe_allow_html=True)
+
+    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
+                        "Pointing Out Hypocrisy", "Shaming and Labelling",
+                        "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     # Ensure page_data is always defined before any further processing
     ITEMS_PER_PAGE = 2  # Show only 2 cases per page
     start_page_idx = st.session_state.page * ITEMS_PER_PAGE
     end_page_idx = (st.session_state.page + 1) * ITEMS_PER_PAGE
     current_page_data = page_data.iloc[start_page_idx:end_page_idx]
-
-    # Display the annotation guidelines if they're set to show
-    if st.session_state.show_guidelines:
-        guidelines = [
-            {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting peace, understanding, or common ground."},
-            {"Strategy": "Warning of Consequences", "Explanation": "Highlights potential negative outcomes such as legal, social, or personal consequences of the hate speech; Serious, cautionary, or urgent tone."},
-            {"Strategy": "Pointing Out Hypocrisy", "Explanation": "Highlights inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone."},
-            {"Strategy": "Shaming and Labelling", "Explanation": "Attacks/condemns and shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone."},
-            {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or rejects the hateful views/ideas expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, direct tone without personal attacks."},
-            {"Strategy": "Fact-Checking", "Explanation": "Mentions specific (sometimes verifiable) information such as facts, statistics, articles, or evidence to contradict claims made in the hate speech; Neutral tone focused on correcting misinformation."},
-            {"Strategy": "Humour/Sarcasm", "Explanation": "Uses humour, irony, or sarcasm to undermine hate speech by mocking the comment or the speaker in a light-hearted or biting way; Playful, funny, or mocking tone."},
-            {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker by challenging the assumptions or logic or simply asking for clarification; Inquisitive or probing tone."}
-        ]
-
-        guidelines_df = pd.DataFrame(guidelines).reset_index(drop=True)
-        html_table = guidelines_df.to_html(index=False, classes='table', border=0)
-        st.markdown(html_table, unsafe_allow_html=True)
-        st.markdown("<br><br>", unsafe_allow_html=True)
-
-    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
-                        "Pointing Out Hypocrisy", "Shaming and Labelling",
-                        "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     for i, row in enumerate(current_page_data.itertuples(), start=start_idx + start_page_idx):
         st.write(f"**Case {i + 1}**")
