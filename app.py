@@ -179,7 +179,7 @@ if st.session_state.username:
                 {"Strategy": "Shaming and Labelling", "Explanation": "Attacks/condemns and shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.", "Examples": "Example 4: ..."},
                 {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or rejects the hateful views/ideas expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, direct tone without personal attacks.", "Examples": "Example 5: ..."},
                 {"Strategy": "Fact-Checking", "Explanation": "Mentions specific (sometimes verifiable) information such as facts, statistics, articles, or evidence to contradict claims made in the hate speech; Neutral tone focused on correcting misinformation.", "Examples": "Example 6: ..."},
-                {"Strategy": "Humour/Sarcasm", "Explanation": "Uses humour, irony, or sarcasm to undermine hate speech by mocking the comment or the speaker in a light-hearted or biting way; Playful, funny, or mocking tone.", "Examples": "Example 7: ..."},
+                {"Strategy": "Humour / Sarcasm", "Explanation": "Uses humour, irony, or sarcasm to undermine hate speech by mocking the comment or the speaker in a light-hearted or biting way; Playful, funny, or mocking tone.", "Examples": "Example 7: ..."},
                 {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker by challenging the assumptions or logic or simply asking for clarification; Inquisitive or probing tone.", "Examples": "Example 8: ..."}
             ]
 
@@ -197,13 +197,13 @@ if st.session_state.username:
                         word-break: break-word;
                     }
                     .table th:nth-child(1), .table td:nth-child(1) {
-                        width: 20%;
+                        width: 22%;
                     }
                     .table th:nth-child(2), .table td:nth-child(2) {
-                        width: 50%;
+                        width: 38%;
                     }
                     .table th:nth-child(3), .table td:nth-child(3) {
-                        width: 30%;
+                        width: 40%;
                     }
                 </style>
             """, unsafe_allow_html=True)
