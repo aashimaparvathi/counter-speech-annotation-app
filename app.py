@@ -174,7 +174,7 @@ if st.session_state.username:
         if st.session_state.show_guidelines:
             guidelines = [
                 {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting peace, understanding, or common ground.", "Examples": "Example 1: ..."},
-                {"Strategy": "Warning of Consequences", "Explanation": "Highlights potential negative outcomes such as legal, social, or personal consequences of the hate speech; Serious, cautionary, or urgent tone.", "Examples": "Example 2: ..."},
+                {"Strategy": "Warning of Consequence", "Explanation": "Highlights potential negative outcomes such as legal, social, or personal consequences of the hate speech; Serious, cautionary, or urgent tone.", "Examples": "Example 2: ..."},
                 {"Strategy": "Pointing Out Hypocrisy", "Explanation": "Highlights inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.", "Examples": "Example 3: ..."},
                 {"Strategy": "Shaming and Labelling", "Explanation": "Attacks/condemns and shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.", "Examples": "Example 4: ..."},
                 {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or rejects the hateful views/ideas expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, direct tone without personal attacks.", "Examples": "Example 5: ..."},
@@ -211,7 +211,7 @@ if st.session_state.username:
             st.markdown(html_table, unsafe_allow_html=True)
             st.markdown("<br><br>", unsafe_allow_html=True)
 
-    strategy_options = ["Empathy and Affiliation", "Warning of Consequences",
+    strategy_options = ["Empathy and Affiliation", "Warning of Consequence",
                         "Pointing Out Hypocrisy", "Shaming and Labelling",
                         "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
