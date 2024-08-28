@@ -265,7 +265,7 @@ if st.session_state.username:
     progress = completed_cases / total_cases
 
     # Display progress bar and progress text
-    st.write(f"Progress: {completed_cases}/{total_cases} cases annotated")
+    st.write(f"{completed_cases}/{total_cases}")
     st.progress(progress)
 
     # Show the Save Annotations button only on the last page and only if all annotations are complete
