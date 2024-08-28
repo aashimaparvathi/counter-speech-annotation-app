@@ -10,7 +10,7 @@ data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
 user_mapping = {
     'CSAT1758': (0, 40),
     'CSAT3968': (40, 80),
-    'CSAT1245': (80, 120),
+    'CSAT1245': (80, 85),
     'CSAT9877': (120, 160),
     'CSAT1290': (160, 200),
     'CSAT7463': (200, 240),
@@ -38,6 +38,7 @@ user_mapping = {
     'CSAT2631': (480, 520),
     'CSAT3942': (520, 560),
 }
+
 
 
 # Initialize session state for user login, guidelines toggle, annotations, comments, and debug mode
@@ -162,6 +163,15 @@ if st.session_state.username:
         st.error("Username not recognized!")
         st.stop()  # Stop the app if the username is not recognized
 
+    # Calculate progress
+    total_cases = len(page_data)
+    completed_cases = sum(len(annotations) > 0 for annotations in st.session_state.annotations.values())
+    progress = completed_cases / total_cases
+
+    # Display progress bar and progress text
+    st.write(f"Progress: {completed_cases}/{total_cases} cases annotated")
+    st.progress(progress)
+
     # Determine the button label based on whether the guidelines are currently shown or hidden
     button_label = "Hide Annotation Guidelines" if st.session_state.show_guidelines else "View Annotation Guidelines"
 
@@ -216,7 +226,7 @@ if st.session_state.username:
                         "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     # Ensure page_data is always defined before any further processing
-    ITEMS_PER_PAGE = 1  # Show only 2 cases per page
+    ITEMS_PER_PAGE = 1  # Show only 1 case per page
     start_page_idx = st.session_state.page * ITEMS_PER_PAGE
     end_page_idx = (st.session_state.page + 1) * ITEMS_PER_PAGE
     current_page_data = page_data.iloc[start_page_idx:end_page_idx]
