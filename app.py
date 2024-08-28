@@ -163,14 +163,6 @@ if st.session_state.username:
         st.error("Username not recognized!")
         st.stop()  # Stop the app if the username is not recognized
 
-    # Calculate progress
-    total_cases = len(page_data)
-    completed_cases = sum(len(annotations) > 0 for annotations in st.session_state.annotations.values())
-    progress = completed_cases / total_cases
-
-    # Display progress bar and progress text
-    st.write(f"Progress: {completed_cases}/{total_cases} cases annotated")
-    st.progress(progress)
 
     # Determine the button label based on whether the guidelines are currently shown or hidden
     button_label = "Hide Annotation Guidelines" if st.session_state.show_guidelines else "View Annotation Guidelines"
@@ -265,6 +257,16 @@ if st.session_state.username:
     with col2:
         if end_page_idx < len(page_data):
             st.button("Next", on_click=next_page)
+
+
+    # Calculate progress
+    total_cases = len(page_data)
+    completed_cases = sum(len(annotations) > 0 for annotations in st.session_state.annotations.values())
+    progress = completed_cases / total_cases
+
+    # Display progress bar and progress text
+    st.write(f"Progress: {completed_cases}/{total_cases} cases annotated")
+    st.progress(progress)
 
     # Show the Save Annotations button only on the last page and only if all annotations are complete
     last_page = (len(page_data) + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE - 1
