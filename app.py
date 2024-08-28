@@ -216,7 +216,7 @@ if st.session_state.username:
                         "Denouncing", "Fact-Checking", "Humour", "Questioning"]
 
     # Ensure page_data is always defined before any further processing
-    ITEMS_PER_PAGE = 2  # Show only 2 cases per page
+    ITEMS_PER_PAGE = 1  # Show only 2 cases per page
     start_page_idx = st.session_state.page * ITEMS_PER_PAGE
     end_page_idx = (st.session_state.page + 1) * ITEMS_PER_PAGE
     current_page_data = page_data.iloc[start_page_idx:end_page_idx]
