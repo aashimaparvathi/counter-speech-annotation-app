@@ -197,10 +197,10 @@ if st.session_state.username:
                         word-break: break-word;
                     }
                     .table th:nth-child(1), .table td:nth-child(1) {
-                        width: 22%;
+                        width: 23%;
                     }
                     .table th:nth-child(2), .table td:nth-child(2) {
-                        width: 38%;
+                        width: 37%;
                     }
                     .table th:nth-child(3), .table td:nth-child(3) {
                         width: 40%;
