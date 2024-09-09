@@ -30,6 +30,10 @@ if 'message_type' not in st.session_state:
 if 'assigned_set' not in st.session_state:
     st.session_state.assigned_set = None
 
+assignments_file = filename = f'data/control/assignments.csv'
+completed_file = filename = f'data/control/completed.csv'
+
+
 # strategies
 strategy_options = [
     "Empathy and Affiliation",
@@ -42,6 +46,18 @@ strategy_options = [
     "Questioning"
 ]
 
+# mapping between strategies and their explanations for tooltips
+strategy_guidelines = {
+    "Empathy and Affiliation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting understanding or common ground.",
+    "Warning of Consequence": "Warns the speaker about potential negative outcomes of the hate speech such as legal, social, or personal consequences; Serious, cautionary, or urgent tone.",
+    "Hypocrisy / Contradiction": "Points out inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.",
+    "Shaming / Labelling": "Attacks, condemns or shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.",
+    "Denouncing": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
+    "Fact-Checking": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.",
+    "Humour / Sarcasm": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.",
+    "Questioning": "Questions the hate speech or speaker, usually expecting an answer, by challenging the logic or simply asking for clarification."
+}
+
 # fetch Prolific PID from URL
 def get_prolific_pid():
     query_params = st.query_params
@@ -52,12 +68,23 @@ def get_prolific_pid():
         return prolific_pid  # If it's already a string, return it directly
     return None
 
+# Check if the PID has already completed the task by checking completed.csv
+def has_completed_task(prolific_pid):
+    try:
+        with open(completed_file, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0] == prolific_pid:
+                    return True
+    except FileNotFoundError:
+        return False
+    return False
 
-# calculate the max width and height needed for buttons
-def get_max_button_size(strategy_options):
-    max_width = max([len(strategy) for strategy in strategy_options]) * 10  # Estimate width
-    max_height = 60  # Fixed height
-    return max_width, max_height
+# Save the PID to completed.csv after annotations are saved
+def mark_as_completed(prolific_pid):
+    with open(completed_file, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([prolific_pid])
 
 # assign a set of cases to each participant, ensuring two participants get the same set
 def assign_set(prolific_pid, max_sets=20):
@@ -66,7 +93,7 @@ def assign_set(prolific_pid, max_sets=20):
 
     # Load existing assignments
     try:
-        with open('assignments.csv', 'r') as f:
+        with open(assignments_file, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
                 assignments[row[0]] = int(row[1])
@@ -87,7 +114,7 @@ def assign_set(prolific_pid, max_sets=20):
                 break
 
         # save new assignment
-        with open('assignments.csv', 'w', newline='') as f:
+        with open(assignments_file, 'w', newline='') as f:
             writer = csv.writer(f)
             for pid, set_id in assignments.items():
                 writer.writerow([pid, set_id])
@@ -95,6 +122,11 @@ def assign_set(prolific_pid, max_sets=20):
 # load Prolific PID and assign a set of cases
 prolific_pid = get_prolific_pid()
 if prolific_pid:
+    # Check if the user has already completed the task
+    if has_completed_task(prolific_pid):
+        st.error("You have already completed this task. Thank you!")
+        st.stop()
+
     st.session_state.username = prolific_pid  # Set PID as the username
     assign_set(prolific_pid)
 else:
@@ -154,9 +186,18 @@ def save_annotations():
                 annotated_data['comments'][i]
             ])
 
+    # Mark the PID as completed
+    mark_as_completed(username)
+
     # exit screen
     st.success("Thank you for completing the task! You may now close this window.")
     st.stop()  # Stop further execution and display the message
+
+# Function to calculate the max width and height needed for buttons
+def get_max_button_size(strategy_options):
+    max_width = max([len(strategy) for strategy in strategy_options]) * 10  # Estimate width
+    max_height = 60  # Fixed height
+    return max_width, max_height
 
 
 # Custom CSS to ensure all buttons have the same height
@@ -217,12 +258,12 @@ with st.sidebar:
     if st.session_state.show_guidelines:
         st.subheader("Annotation Guidelines")
         guidelines = [
-                {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting peace, understanding, or common ground.", "Examples": "Example 1: ..."},
+                {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting understanding or common ground.", "Examples": "Example 1: ..."},
                 {"Strategy": "Warning of Consequence", "Explanation": "Warns the speaker about potential negative outcomes of the hate speech such as legal, social, or personal consequences; Serious, cautionary, or urgent tone.", "Examples": "Example 2: ..."},
                 {"Strategy": "Hypocrisy / Contradiction", "Explanation": "Points out inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.", "Examples": "Example 3: ..."},
                 {"Strategy": "Shaming / Labelling", "Explanation": "Attacks, condemns or shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.", "Examples": "Example 4: ..."},
                 {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.", "Examples": "Example 5: ..."},
-                {"Strategy": "Fact-Checking", "Explanation": "Mentions specific information such as relevant facts with or without verifiable evidence to contradict the claims made in the hate speech; Focused on FACTUALLY correcting misinformation.", "Examples": "Example 6: ..."},
+                {"Strategy": "Fact-Checking", "Explanation": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.", "Examples": "Example 6: ..."},
                 {"Strategy": "Humour / Sarcasm", "Explanation": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.", "Examples": "Example 7: ..."},
                 {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker, usually expecting an answer, by challenging the logic or simply asking for clarification.", "Examples": "Example 8: ..."}
             ]
@@ -231,10 +272,11 @@ with st.sidebar:
         st.markdown(html_table, unsafe_allow_html=True)
 
 # Show warning at the start if annotations are incomplete
-if not all(len(st.session_state.annotations[idx]) > 0 for idx in page_data.index):
-    st.warning("Please complete all annotations before exiting.")
+if 'page_data' in locals():  # Ensures page_data exists
+    if not all(len(st.session_state.annotations[idx]) > 0 for idx in page_data.index):
+        st.warning("Please complete all annotations before exiting.")
 
-# Check if user is logged in
+# Check if user is logged in (DEBUGGING)
 if st.session_state.assigned_set is not None:
     st.write(f"Assigned Set: {st.session_state.assigned_set + 1}")
 
@@ -247,7 +289,6 @@ if st.session_state.assigned_set is not None:
     for i, row in enumerate(current_page_data.itertuples(), start=start_page_idx):
         st.write(f"**Case {i + 1}**")
 
-
         st.markdown(f"**Hate Speech:** {row.hatespeech}")
         st.markdown(f"**Counter Speech:** {row.counterspeech}")
         st.markdown("<br><br>", unsafe_allow_html=True)
@@ -259,7 +300,12 @@ if st.session_state.assigned_set is not None:
         for j, strategy in enumerate(strategy_options):
             is_selected = strategy in selected_strategies
             button_label = f"✅ {strategy}" if is_selected else strategy
-            if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
+
+            # Get the corresponding guideline for this strategy
+            guideline_tooltip = strategy_guidelines.get(strategy, "Click to select or deselect")
+
+            # Display button with the guideline tooltip
+            if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help=guideline_tooltip):
                 if strategy in selected_strategies:
                     selected_strategies.remove(strategy)
                 else:
@@ -268,9 +314,6 @@ if st.session_state.assigned_set is not None:
                 st.rerun()  # Immediately rerun to sync the button state
 
         st.markdown("<br><br>", unsafe_allow_html=True)
-        # Add a free text box for comments with help text
-        #comment_help_text = "Your thoughts on the case. E.g., a mismatch between HS and CS or why this case was particularly difficult, etc."
-        #st.session_state.comments[i] = st.text_area("Comments", value=st.session_state.comments[i], key=f"comments_{i}", help=comment_help_text)
 
         # Free text box for comments with help text and placeholder
         comment_help_text = """
@@ -287,7 +330,6 @@ if st.session_state.assigned_set is not None:
             help=comment_help_text,
             placeholder="e.g., Confused between denouncing and fact-checking, mismatch between hate speech and counterspeech, counterspeech seems offensive, difficult to annotate because ..."
         )
-
 
     # Pagination buttons
     col1, col2, col3 = st.columns([1, 6, 1])
@@ -314,3 +356,20 @@ if st.session_state.assigned_set is not None:
             st.button("Save and Exit", on_click=save_annotations)
 else:
     st.sidebar.warning("No set has been assigned to you yet. Please refresh the page or check the Prolific link.")
+
+
+#BACKUP
+# Display buttons for strategy selection as two rows
+#        cols = st.columns(4)
+#        for j, strategy in enumerate(strategy_options):
+#            is_selected = strategy in selected_strategies
+#            button_label = f"✅ {strategy}" if is_selected else strategy
+#            if cols[j % 4].button(button_label, key=f"strategy_{i}_{strategy}", help="Click to select or deselect"):
+#                if strategy in selected_strategies:
+#                    selected_strategies.remove(strategy)
+#                else:
+#                    selected_strategies.append(strategy)
+#                st.session_state.annotations[i] = selected_strategies
+#                st.rerun()  # Immediately rerun to sync the button state
+
+
