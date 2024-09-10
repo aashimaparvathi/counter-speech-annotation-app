@@ -52,8 +52,8 @@ strategy_guidelines = {
     "Warning of Consequence": "Warns the speaker about potential negative outcomes of the hate speech such as legal, social, or personal consequences; Serious, cautionary, or urgent tone.",
     "Hypocrisy / Contradiction": "Points out inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.",
     "Shaming / Labelling": "Attacks, condemns or shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.",
-    "Denouncing": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
-    "Fact-Checking": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.",
+    "Denouncing": "Condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
+    "Fact-Checking": "Mentions relevant information or facts (with or without evidence) to contradict the hate speech or asks for evidence for the claims made; FACTUALLY corrects misinformation.",
     "Humour / Sarcasm": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.",
     "Questioning": "Questions the hate speech or speaker, usually expecting an answer, by challenging the logic or simply asking for clarification."
 }
@@ -276,12 +276,12 @@ with st.sidebar:
                  "Examples": "HS: Faggots are ruining this country. CS: It seems you've become intolerant to homosexuals, maybe reflect on why love bothers you so much."},
 
                 {"Strategy": "Denouncing",
-                 "Explanation": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
+                 "Explanation": "Condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
                  "Examples": "HS: I miss the good old days when we had black domestic workers. CS: The West got rid of slavery. But we've never really left racism."},
 
                 {"Strategy": "Fact-Checking",
-                 "Explanation": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.",
-                 "Examples": "HS: Women can't handle money. CS: What proof do you have? The stereotype comes from medieval myths, not real financial behavior."},
+                 "Explanation": "Mentions relevant information or facts (with or without evidence) to contradict the hate speech or asks for evidence for the claims made; FACTUALLY corrects misinformation.",
+                 "Examples": "HS: Women can't handle money. CS: What proof do you have? This stereotype comes from medieval myths, not real financial behavior."},
 
                 {"Strategy": "Humour / Sarcasm",
                  "Explanation": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.",
@@ -383,8 +383,8 @@ else:
     st.sidebar.warning("No set has been assigned to you yet. Please refresh the page or check the Prolific link.")
 
 
-#BACKUP
-# Display buttons for strategy selection as two rows
+# # BACKUP
+# # Display buttons for strategy selection as two rows
 #        cols = st.columns(4)
 #        for j, strategy in enumerate(strategy_options):
 #            is_selected = strategy in selected_strategies
