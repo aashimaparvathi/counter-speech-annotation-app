@@ -8,7 +8,7 @@ from datetime import datetime  # Import to include timestamps
 TOTAL_CASES = 5  # change this value to control the number of cases
 
 # Load the data
-data = pd.read_csv('data/intentconanv2/40-per-target-sample.csv')
+data = pd.read_csv('data/iconan/40-per-target-sample.csv')
 
 # Initialise session state for user login, guidelines toggle, annotations, comments, and debug mode
 if 'username' not in st.session_state:
@@ -145,8 +145,8 @@ def save_annotations():
     annotated_data = {
         'username': [],
         'id': [],
-        'hs_id': [],
-        'id_orig': [],
+        #'hs_id': [],
+        #'id_orig': [],
         'hatespeech': [],
         'counterspeech': [],
         'annotations': [],
@@ -159,8 +159,8 @@ def save_annotations():
         actual_index = int(index)
         annotated_data['username'].append(username)
         annotated_data['id'].append(data.iloc[actual_index]['id'])
-        annotated_data['hs_id'].append(data.iloc[actual_index]['hs_id'])
-        annotated_data['id_orig'].append(data.iloc[actual_index]['id_orig'])
+        #'].append(data.iloc[actual_index]['hs_id'])
+        #annotated_data['id_orig'].append(data.iloc[actual_index]['id_orig'])
         annotated_data['hatespeech'].append(data.iloc[actual_index]['hatespeech'])
         annotated_data['counterspeech'].append(data.iloc[actual_index]['counterspeech'])
         annotated_data['annotations'].append(", ".join(annotations))
@@ -173,13 +173,14 @@ def save_annotations():
     # write annotations to CSV file
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['username', 'id', 'hs_id', 'id_orig', 'hatespeech', 'counterspeech', 'annotations', 'comments'])
+        #writer.writerow(['username', 'id', 'hs_id', 'id_orig', 'hatespeech', 'counterspeech', 'annotations', 'comments'])
+        writer.writerow(['username', 'id', 'hatespeech', 'counterspeech', 'annotations', 'comments'])
         for i in range(len(annotated_data['id'])):
             writer.writerow([
                 annotated_data['username'][i],
                 annotated_data['id'][i],
-                annotated_data['hs_id'][i],
-                annotated_data['id_orig'][i],
+                #annotated_data['hs_id'][i],
+                #annotated_data['id_orig'][i],
                 annotated_data['hatespeech'][i],
                 annotated_data['counterspeech'][i],
                 annotated_data['annotations'][i],
