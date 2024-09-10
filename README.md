@@ -20,8 +20,11 @@ Run the annotation app
 streamlit run app.py
 ```
 
-## Dataset
+## Datasets
 
-IntentCONAN (ICONAN): From the ACL'23 Paper _Counterspeeches up my sleeve! Intent Distribution Learning and Persistent Fusion for Intent-Conditioned Counterspeech Generation_
+- **IConan**:
 
-[quarc-counterspeech](https://github.com/LCS2-IIITD/quarc-counterspeech)
+  > Haiyang Wang, Zhiliang Tian, Xin Song, Yue Zhang, Yuchen Pan, Hongkui Tu, Minlie Huang, and Bin Zhou. Intent-Aware and Hate-Mitigating Counterspeech Generation via Dual-Discriminator Guided LLMs.
+
+- **IntentConanV2**:
+  > Amey Hengle, Aswini Kumar, Sahajpreet Singh, Anil Bandhakavi, Md Shad Akhtar, and Tanmoy Chakroborty. Intent-conditioned and Non-toxic Counterspeech Generation using Multi-Task Instruction Tuning with RLAIF.
