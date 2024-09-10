@@ -244,7 +244,7 @@ st.title('Counterspeech Strategy Annotation')
 
 # Display Prolific PID (username)
 if st.session_state.username:
-    st.write(f"Prolific PID: {st.session_state.username}")
+    st.write(f"Prolific PID: {st.session_state.username}") # DEBUG
 
 # View/Hide Annotation Guidelines toggle sync
 button_label = "Hide Annotation Guidelines" if st.session_state.show_guidelines else "View Annotation Guidelines"
@@ -259,14 +259,37 @@ with st.sidebar:
     if st.session_state.show_guidelines:
         st.subheader("Annotation Guidelines")
         guidelines = [
-                {"Strategy": "Empathy and Affiliation", "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting understanding or common ground.", "Examples": "Example 1: ..."},
-                {"Strategy": "Warning of Consequence", "Explanation": "Warns the speaker about potential negative outcomes of the hate speech such as legal, social, or personal consequences; Serious, cautionary, or urgent tone.", "Examples": "Example 2: ..."},
-                {"Strategy": "Hypocrisy / Contradiction", "Explanation": "Points out inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.", "Examples": "Example 3: ..."},
-                {"Strategy": "Shaming / Labelling", "Explanation": "Attacks, condemns or shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.", "Examples": "Example 4: ..."},
-                {"Strategy": "Denouncing", "Explanation": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.", "Examples": "Example 5: ..."},
-                {"Strategy": "Fact-Checking", "Explanation": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.", "Examples": "Example 6: ..."},
-                {"Strategy": "Humour / Sarcasm", "Explanation": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.", "Examples": "Example 7: ..."},
-                {"Strategy": "Questioning", "Explanation": "Questions the hate speech or speaker, usually expecting an answer, by challenging the logic or simply asking for clarification.", "Examples": "Example 8: ..."}
+                {"Strategy": "Empathy and Affiliation",
+                "Explanation": "Uses kind, compassionate, or understanding language expressing empathy or concern towards the speaker or targeted group; Focuses on promoting understanding or common ground.",
+                "Examples": "HS: We can't bring in millions of refugees, and we shouldn't just accept the ills of Islam. CS: These are people in need—our brothers and sisters. We should help them."},
+
+                {"Strategy": "Warning of Consequence",
+                 "Explanation": "Warns the speaker about potential negative outcomes of the hate speech such as legal, social, or personal consequences; Serious, cautionary, or urgent tone.",
+                 "Examples": "HS: We should forget the Shoah and solve the Jewish issue once and for all. CS: Ignoring history risks hurting future generations by not teaching them the lessons of the past."},
+
+                {"Strategy": "Hypocrisy / Contradiction",
+                 "Explanation": "Points out inconsistencies, illogical reasoning, contradictions, or double standards in the hate speech; Critical, logical, or analytical tone.",
+                 "Examples": "HS: Zionist and Jewish control of America is the main cause of global terrorism and conflict. CS: Isn't colonialism and Western intervention abroad what led to much of the extremism?"},
+
+                {"Strategy": "Shaming / Labelling",
+                 "Explanation": "Attacks, condemns or shames the speaker with negative terms or labels to highlight immorality or inappropriateness; Confrontational or accusatory tone.",
+                 "Examples": "HS: Faggots are ruining this country. CS: It seems you've become intolerant to homosexuals, maybe reflect on why love bothers you so much."},
+
+                {"Strategy": "Denouncing",
+                 "Explanation": "Explicitly condemns or MORALLY rejects the hateful views expressed in the hate speech by stating it is wrong, unacceptable, harmful, etc.; Firm, moral tone without personal attacks.",
+                 "Examples": "HS: I miss the good old days when we had black domestic workers. CS: The West got rid of slavery. But we've never really left racism."},
+
+                {"Strategy": "Fact-Checking",
+                 "Explanation": "Mentions relevant information or facts with or without evidence to contradict the hate speech or asks for evidence for the claims made; Focused on FACTUALLY correcting misinformation.",
+                 "Examples": "HS: Women can't handle money. CS: What proof do you have? The stereotype comes from medieval myths, not real financial behavior."},
+
+                {"Strategy": "Humour / Sarcasm",
+                 "Explanation": "Uses humour, sarcasm, or irony to undermine hate speech by mocking the comment or the speaker, sometimes in a biting way; Funny, mocking, or playful tone.",
+                 "Examples": "HS: Jews are why the World Cup is so expensive. CS: Oh, I thought it was players' salaries... but sure, let's blame the usual Jewish conspiracy!"},
+
+                {"Strategy": "Questioning",
+                 "Explanation": "Questions the hate speech or speaker, usually expecting an answer, by challenging the logic or simply asking for clarification.",
+                 "Examples": "HS: All Muslims are incompatible with any Western society. CS: I'm not sure what you are trying to say by incompatible. What do you mean by incompatible?"}
             ]
         guidelines_df = pd.DataFrame(guidelines)
         html_table = guidelines_df.to_html(index=False, classes='table', border=0)
@@ -277,9 +300,9 @@ if 'page_data' in locals():  # Ensures page_data exists
     if not all(len(st.session_state.annotations[idx]) > 0 for idx in page_data.index):
         st.warning("Please complete all annotations before exiting.")
 
-# Check if user is logged in (DEBUGGING)
+# Check if user is logged in (DEBUG)
 if st.session_state.assigned_set is not None:
-    st.write(f"Assigned Set: {st.session_state.assigned_set + 1}")
+    st.write(f"Assigned Set: {st.session_state.assigned_set + 1}") # DEBUG
 
     # page_data
     ITEMS_PER_PAGE = 1  # only 1 case per page
@@ -288,10 +311,10 @@ if st.session_state.assigned_set is not None:
     current_page_data = page_data.iloc[start_page_idx:end_page_idx]
 
     for i, row in enumerate(current_page_data.itertuples(), start=start_page_idx):
-        st.write(f"**Case {i + 1}**")
+        st.write(f"**Case {i + 1}**") # DEBUG
 
-        st.markdown(f"**Hate Speech:** {row.hatespeech}")
-        st.markdown(f"**Counter Speech:** {row.counterspeech}")
+        st.markdown(f"**Hate Speech (HS):** {row.hatespeech}")
+        st.markdown(f"**Counter Speech (CS):** {row.counterspeech}")
         st.markdown("<br><br>", unsafe_allow_html=True)
 
         selected_strategies = st.session_state.annotations[i]
@@ -319,7 +342,7 @@ if st.session_state.assigned_set is not None:
         # Free text box for comments with help text and placeholder
         comment_help_text = """
         Optional: Please share your thoughts about the case, such as:
-        - Confusion between strategies (e.g., confused between denouncing and fact-checking)
+        - Confusion between strategies (e.g., confused between strategy X and Y)
         - Issues with the case (e.g., mismatch between hate speech and counterspeech)
         - e.g., the counterspeech itself appears offensive
         - e.g., this case is particularly difficult to annotate because ...
@@ -329,9 +352,10 @@ if st.session_state.assigned_set is not None:
             value=st.session_state.comments[i],
             key=f"comments_{i}",
             help=comment_help_text,
-            placeholder="e.g., Confused between denouncing and fact-checking, mismatch between hate speech and counterspeech, counterspeech seems offensive, difficult to annotate because ..."
+            placeholder="e.g., Confused between strategy X and Y, mismatch between HS and CS, counterspeech itself seems offensive, this case is difficult to annotate because ..."
         )
 
+    st.markdown("<br>", unsafe_allow_html=True)
     # Pagination buttons
     col1, col2, col3 = st.columns([1, 6, 1])
     with col1:
@@ -347,7 +371,7 @@ if st.session_state.assigned_set is not None:
     progress = completed_cases / total_cases
 
     # display progress bar and progress text
-    st.write(f"Progress: {completed_cases}/{total_cases} cases annotated")
+    st.write(f"{completed_cases}/{total_cases}")
     st.progress(progress)
 
     # Show Save and Exit button only on the last page and only if all annotations are complete
