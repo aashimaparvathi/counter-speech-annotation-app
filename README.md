@@ -2,6 +2,13 @@
 
 Streamlit annotation interface for counterspeech strategy annotation.
 
+Create and activate environment
+
+```
+conda create -n conda@streamlit
+conda activate conda@streamlit
+```
+
 Install dependencies
 
 ```
@@ -14,7 +21,13 @@ or depending on environment
 conda install streamlit
 ```
 
-Run the annotation app
+Clone the repository
+
+```
+git clone https://github.com/aashimaparvathi/counter-speech-annotation-app.git
+```
+
+Switch to the local directory and run the annotation app
 
 ```
 streamlit run app.py
